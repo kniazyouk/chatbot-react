@@ -43,9 +43,14 @@ export async function getGroqResponse(
   knowledgeBase: string,
 ): Promise<GeminiResponse> {
   const apiKey = process.env.GROQ_API_KEY;
+  const model = process.env.GROQ_MODEL;
 
   if (!apiKey) {
     return { response: 'API key is not set. Set GROQ_API_KEY in the .env file.', action: 'RESPOND' };
+  }
+
+  if (!model) {
+    return { response: 'Model not set. Set GROQ_MODEL in .env (e.g. "llama-3.3-70b-versatile"). See https://console.groq.com/docs/models', action: 'RESPOND' };
   }
 
   const systemPrompt = buildSystemPrompt(knowledgeBase);
@@ -58,8 +63,6 @@ export async function getGroqResponse(
     })),
     { role: 'user', content: userInput },
   ];
-
-  const model = process.env.GROQ_MODEL || 'llama-3.1-70b-versatile';
 
   const payload = {
     model,
