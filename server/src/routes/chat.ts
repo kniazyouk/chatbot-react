@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import { getKnowledgeBase } from '../services/knowledge.js';
-import { getGeminiResponse } from '../services/gemini.js';
+import { getGroqResponse } from '../services/groq.js';
 import { sendWhatsAppMessage, formatHandoffMessage } from '../services/whatsapp.js';
 import type { Session, ChatTurn } from '../types/index.js';
 import { getIO } from '../socket.js';
@@ -25,7 +25,7 @@ router.post('/', async (req: Request, res: Response) => {
 
   const knowledgeBase = getKnowledgeBase();
 
-  const result = await getGeminiResponse(message, session.history, knowledgeBase);
+  const result = await getGroqResponse(message, session.history, knowledgeBase);
 
   const userTurn: ChatTurn = { role: 'user', parts: [{ text: message }] };
   const modelTurn: ChatTurn = { role: 'model', parts: [{ text: result.response }] };
