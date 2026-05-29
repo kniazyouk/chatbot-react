@@ -9,7 +9,7 @@ const router = Router();
 
 const sessions = new Map<string, Session>();
 
-router.post('/chat', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   const { message, sessionId } = req.body as { message: string; sessionId: string };
 
   if (!message || !sessionId) {

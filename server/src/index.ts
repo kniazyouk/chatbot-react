@@ -26,8 +26,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/api', rateLimit(), chatRouter);
-app.use('/api', whatsappRouter);
+app.use('/api/chat', rateLimit(), chatRouter);
+app.use('/api', whatsappRouter); // webhook sin rate limit
 
 io.on('connection', (socket) => {
   socket.on('join-room', ({ sessionId }: { sessionId: string }) => {
