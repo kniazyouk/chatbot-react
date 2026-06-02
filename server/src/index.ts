@@ -4,13 +4,13 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import chatRouter from './routes/chat.js';
-import whatsappRouter from './routes/whatsapp.js';
 import { setIO } from './socket.js';
 import { rateLimit } from './middleware/rateLimit.js';
+import { initDiscordBot } from './services/discord.js';
 
 const startTime = new Date().toISOString();
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const httpServer = createServer(app);
@@ -37,13 +37,11 @@ app.get('/', (_req, res) => {
     endpoints: {
       chat: 'POST /api/chat',
       session: 'GET /api/chat/session/:id',
-      webhook: 'GET|POST /api/webhook/whatsapp',
     },
   });
 });
 
 app.use('/api/chat', rateLimit(), chatRouter);
-app.use('/api', whatsappRouter); // webhook sin rate limit
 
 io.on('connection', (socket) => {
   socket.on('join-room', ({ sessionId }: { sessionId: string }) => {
@@ -51,6 +49,8 @@ io.on('connection', (socket) => {
     console.log(`Socket joined room: ${sessionId}`);
   });
 });
+
+initDiscordBot();
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {

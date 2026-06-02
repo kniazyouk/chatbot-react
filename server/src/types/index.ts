@@ -14,8 +14,4 @@ export interface Session {
   contactInfo?: string;
 }
 
-export interface WhatsappMessage {
-  from: string;
-  text: string;
-  timestamp: string;
-}
+

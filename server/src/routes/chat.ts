@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { getKnowledgeBase } from '../services/knowledge.js';
 import { getGroqResponse } from '../services/groq.js';
-import { sendWhatsAppMessage, formatHandoffMessage } from '../services/whatsapp.js';
+import { sendHandoffToDiscord } from '../services/discord.js';
 import type { Session, ChatTurn } from '../types/index.js';
 import { getIO } from '../socket.js';
 
@@ -34,14 +34,10 @@ router.post('/', async (req: Request, res: Response) => {
   if (result.action === 'INITIATE_HANDOFF') {
     session.handoffStatus = 'pending';
 
-    const agentNumber = process.env.WHATSAPP_AGENT_NUMBER;
-    if (agentNumber) {
-      const historyText = session.history
-        .map(t => `${t.role === 'user' ? 'Usuario' : 'Bot'}: ${t.parts[0].text}`)
-        .join('\n');
-      const msg = formatHandoffMessage(sessionId, historyText);
-      await sendWhatsAppMessage(agentNumber, msg);
-    }
+    const historyText = session.history
+      .map(t => `${t.role === 'user' ? 'Usuario' : 'Bot'}: ${t.parts[0].text}`)
+      .join('\n');
+    await sendHandoffToDiscord(sessionId, historyText, session.contactInfo);
 
     res.json({
       response: result.response,
